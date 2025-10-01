@@ -25,7 +25,7 @@ struct CarInfoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeTabView()
         }
         .modelContainer(sharedModelContainer)
     }
