@@ -7,9 +7,12 @@
 
 import SwiftUI
 import SwiftData
+import Supabase
 
 @main
 struct CarInfoApp: App {
+    @State private var authVM = AuthViewModel()
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -26,6 +29,7 @@ struct CarInfoApp: App {
     var body: some Scene {
         WindowGroup {
             HomeTabView()
+                .environment(authVM)
         }
         .modelContainer(sharedModelContainer)
     }

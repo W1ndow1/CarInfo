@@ -9,51 +9,81 @@ import SwiftUI
 
 struct ClimateControlView: View {
     @EnvironmentObject var vm: ControlViewViewModel
+    @Binding var isPresented: Bool
     
     var body: some View {
-        VStack {
-            RoundedRectangle(cornerRadius: 30)
-                //.stroke(Color.white, lineWidth: 1)
-                .frame(width: 250, height: 300)
-                .foregroundStyle(Color.primary.opacity(0.15))
-                .overlay {
-                    VStack(spacing: 20) {
+        if isPresented {
+            ZStack {
+                //배경
+                Color.primary.colorInvert()
+                    .foregroundStyle(Color.white)
+                    .ignoresSafeArea()
+                    .zIndex(0)
+                
+                VStack(spacing: 30) {
+                    //상단 네비게이션바
+                    HStack {
                         Button {
-                            vm.isSteeringWheelHeatOn.toggle()
+                            withAnimation {
+                                isPresented = false
+                            }
                         } label: {
-                            Image(systemName: "steeringwheel.and.heat.waves")
-                                .font(.system(size: 40, weight: .light))
-                                .foregroundStyle(vm.isSteeringWheelHeatOn ? Color.red : Color.primary)
+                            Group {
+                                Image(systemName: "chevron.backward")
+                                    .font(.system(size: 18, weight: .medium))
+                                Text("뒤로")
+                            }
+                            .foregroundStyle(Color.primary)
                         }
-                        .padding(.trailing, 90)
-                        .padding(.top, 40)
-                        .padding(.bottom, 5)
-                        
-                        HStack(spacing: 40) {
-                            SeatHeaterControl(position: .driver)
-                            SeatHeaterControl(position: .passenger)
-                        }
-                        
-                        HStack(spacing: 40) {
-                            SeatHeaterControl(position: .rearLeft)
-                            SeatHeaterControl(position: .rearRight)
-                        }
+                        .padding(.leading, 20)
                         Spacer()
+                        
                     }
+                    //차량 좌석
+                    RoundedRectangle(cornerRadius: 30)
+                        .frame(width: 250, height: 300)
+                        .foregroundStyle(Color.gray.gradient)
+                        .overlay {
+                            VStack(spacing: 20) {
+                                Button {
+                                    vm.isSteeringWheelHeatOn.toggle()
+                                } label: {
+                                    Image(systemName: "steeringwheel.and.heat.waves")
+                                        .font(.system(size: 40, weight: .light))
+                                        .foregroundStyle(vm.isSteeringWheelHeatOn ? Color.red : Color.primary)
+                                }
+                                .padding(.trailing, 90)
+                                .padding(.top, 40)
+                                .padding(.bottom, 5)
+                                
+                                HStack(spacing: 40) {
+                                    SeatHeaterControl(position: .driver)
+                                    SeatHeaterControl(position: .passenger)
+                                }
+                                
+                                HStack(spacing: 40) {
+                                    SeatHeaterControl(position: .rearLeft)
+                                    SeatHeaterControl(position: .rearRight)
+                                }
+                                Spacer()
+                            }
+                        }
+                    Spacer()
                 }
-            Spacer()
+                .zIndex(1)
+                .sheet(isPresented: .constant(true)) {
+                    sheetView()
+                        .interactiveDismissDisabled(true)
+                        .presentationDetents([.height(300), .height(450)])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+                        .presentationCornerRadius(20)
+                    
+                }
+            }
         }
-        .sheet(isPresented: .constant(true)) {
-            sheetView()
-                .interactiveDismissDisabled(true)
-                .presentationDetents([.height(300), .height(450)])
-                .presentationDragIndicator(.visible)
-                .presentationBackgroundInteraction(.enabled)
-                .presentationCornerRadius(20)
-            
-        }
-        
     }
+    
     @ViewBuilder
     func sheetView() -> some View {
         ScrollView {
@@ -170,7 +200,7 @@ struct ClimateControlView: View {
                 
                 Divider()
                     .padding(.horizontal, 27)
-
+                
                 Spacer()
                 
             }
@@ -179,7 +209,7 @@ struct ClimateControlView: View {
 }
 
 #Preview {
-    ClimateControlView()
+    ClimateControlView(isPresented: .constant(true))
         .environmentObject(ControlViewViewModel())
 }
 

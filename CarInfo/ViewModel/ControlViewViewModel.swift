@@ -21,6 +21,13 @@ class ControlViewViewModel: ObservableObject {
         .rearLeft: SeatHeaterStatus(level: 0),
         .rearRight: SeatHeaterStatus(level: 0),
     ]
+    @Published var cameraStatuses: [CameraPosition: Bool] = [
+        .front: false,
+        .back: false,
+        .inner: false,
+        .left: false,
+        .right: false
+    ]
     
     init() {
         getCarStatus()
@@ -47,5 +54,18 @@ class ControlViewViewModel: ObservableObject {
     
     func getHeaterLevel(for position: SeatPosition) -> Int {
         return seatHeaterStatuses[position]?.level ?? 0
+    }
+    
+    func setCameraStatus(for position: CameraPosition) {
+        if var status = cameraStatuses[position] {
+            status.toggle()
+            cameraStatuses[position] = status
+            
+            //서버에 카메라 영상 요청 보내기
+        }
+    }
+    
+    func getCameraStatus(for position: CameraPosition) -> Bool {
+        return cameraStatuses[position] ?? false
     }
 }

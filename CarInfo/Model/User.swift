@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+
+struct User: Identifiable {
+    let id: String
+    let email: String
+    let displayName: String
+    let createdAt: Date
+    var profileImageURL: String?
+}
