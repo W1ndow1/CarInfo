@@ -10,11 +10,20 @@ import SwiftUI
 
 class ControlViewViewModel: ObservableObject {
     
-    @Published var carStatus = CarStatus()
-    @Published var setTemp: Double = 22.0
+    @Published var carStatus: CarStatus?
     @Published var isFanOn: Bool = false
     @Published var isSteeringWheelHeatOn: Bool = false
     @Published var isCarseatHeatOn: Bool = false
+    @Published var setTemp: Double = 22.0 {
+        didSet {
+            if setTemp > maxTemperature {
+                setTemp = maxTemperature
+            }
+            if setTemp < minTemperature {
+                setTemp = minTemperature
+            }
+        }
+    }
     @Published var seatHeaterStatuses: [SeatPosition: SeatHeaterStatus] = [
         .driver: SeatHeaterStatus(level: 0),
         .passenger: SeatHeaterStatus(level: 0),
@@ -29,16 +38,27 @@ class ControlViewViewModel: ObservableObject {
         .right: false
     ]
     
-    init() {
-        getCarStatus()
+    private var maxTemperature: Double = 27.0
+    private var minTemperature: Double = 18.0
+    
+    var currentCarStatus: CarStatus {
+        carStatus ?? CarStatus.mock()
     }
     
-    func getCarStatus() {
-        self.carStatus = CarStatus()
+    init() {
+        
+    }
+
+    
+    func fetchUserCarData(userId: UUID) async throws -> CarStatus {
+        let status = self.carStatus
+        return status!
+        
+        
     }
     
     func toggleFanControl() {
-        carStatus.isFanOn.toggle()
+        //carStatus.isFanOn.toggle()
     }
     
     func setSeatHeaterLevel(for position: SeatPosition, to newLevel: Int) {

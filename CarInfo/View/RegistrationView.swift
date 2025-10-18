@@ -12,6 +12,7 @@ struct RegistrationView: View {
     @Environment(AuthViewModel.self) private var authVM
     
     @State private var email = ""
+    @State private var username = ""
     @State private var password = ""
     @State private var confirmedPassward = ""
     @State private var passwordsMatch = false
@@ -25,6 +26,10 @@ struct RegistrationView: View {
             Group {
                 TextField(text: $email, label: {
                     Text("이메일")
+                        .foregroundStyle(Color.primary)
+                })
+                TextField(text: $username, label: {
+                    Text("사용자명")
                         .foregroundStyle(Color.primary)
                 })
                 ZStack(alignment:.trailing) {
@@ -59,7 +64,7 @@ struct RegistrationView: View {
             
             Button{
                 Task {
-                    await authVM.signUp(email: email, password: password)
+                    await authVM.signUp(email: email, password: password, username: username)
                 }
             } label: {
                 Text("회원가입")

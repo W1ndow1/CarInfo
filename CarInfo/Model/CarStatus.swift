@@ -21,7 +21,11 @@ enum CarType: String, Codable {
     case dieselCar = "디젤차"
 }
 
-struct CarStatus: Codable {
+struct CarStatus: Codable, Identifiable {
+    
+    var id: UUID
+    var user_id: UUID
+    
     var status = CarStatusType.parking
     var batteryLevel: Double = 0.56
     var location: String = "서울시 용산구"
@@ -44,4 +48,34 @@ struct CarStatus: Codable {
     private var maxTemperature: Double = 27.0
     private var minTemperature: Double = 18.0
     
+    enum CodingKeys: String, CodingKey {
+        case id, user_id, location, status, doorLock
+        
+        case batteryLevel = "battery_level"
+        case carName = "car_name"
+        case carType = "car_type"
+        case isFanOn = "is_fan_on"
+        case carTemp = "car_temp"
+        case outsideTemp = "outside_temp"
+        case setTemp = "set_temp"
+    }
+}
+
+extension CarStatus {
+    static func mock() -> CarStatus {
+        CarStatus(
+            id: UUID(),
+            user_id: UUID(),
+            status: CarStatusType.parking,
+            batteryLevel: 0.62,
+            location: "서울시 용산구",
+            doorLock: true,
+            carName: "마이카",
+            carType: CarType.electricCar,
+            isFanOn: false,
+            carTemp: 22.0,
+            outsideTemp: 26.0,
+            setTemp: 22.0
+            )
+    }
 }

@@ -15,6 +15,9 @@ struct ControlView: View {
     @State private var chargeValue: CGFloat = 80
     @State private var isWindowOpen = false
     @State private var isFanOptionOn = false
+    @Environment(UserManager.self) var userManager
+    
+    var currentUserID: String = ""
     
     var body: some View {
         NavigationStack {
@@ -28,7 +31,7 @@ struct ControlView: View {
                         VStack(alignment: .leading, spacing: -5){
                             Text("씽씽이")
                                 .font(.system(size: 20, weight: .bold))
-                            DynamicBatteryView(batteryLevel: viewModel.carStatus.batteryLevel)
+                            DynamicBatteryView(batteryLevel: viewModel.currentCarStatus.batteryLevel)
                                 .frame(width: 40, height: 35)
                             Text("주차중")
                                 .font(.system(size: 15, weight: .light))
@@ -41,7 +44,7 @@ struct ControlView: View {
                                 Text("흐림")
                                     .font(.system(size: 20, weight: .light))
                             }
-                            Text(String(format:"%.0f", viewModel.carStatus.outsideTemp) + "℃")
+                            Text(String(format:"%.0f", viewModel.currentCarStatus.setTemp) + "℃")
                         }
                     }
                     .padding(.horizontal, 5)
@@ -87,7 +90,7 @@ struct ControlView: View {
                                 if viewModel.isFanOn {
                                     Text("활성")
                                 }
-                                Text(String(format:"%.0f", viewModel.carStatus.setTemp) + "℃")
+                                Text(String(format:"%.0f", viewModel.currentCarStatus.setTemp) + "℃")
                             }
                         }
                         Spacer()
@@ -99,7 +102,10 @@ struct ControlView: View {
                
                 //카메라
                 NavigationLink(destination:
-                                SecurityCameraView().environmentObject(viewModel)) {
+                                SecurityCameraView()
+                    .environmentObject(viewModel)
+                    .environment(userManager)
+                ) {
                     HStack {
                         Image(systemName: "video")
                             .font(.system(size: 30, weight: .light))
@@ -244,6 +250,7 @@ struct ControlView: View {
 #Preview {
     HomeTabView()
         .environment(AuthViewModel())
+        .environment(UserManager())
 }
 
 

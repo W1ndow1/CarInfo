@@ -10,20 +10,13 @@ import SwiftUI
 struct SecurityCameraView: View {
     @EnvironmentObject var vm: ControlViewViewModel
     @Environment(\.dismiss) var dismiss
+    @Environment(UserManager.self) var userManager
     
     var body: some View {
         VStack(spacing: 1) {
             HStack(spacing: 1) {
-                Rectangle()
-                    .frame(width: 200, height: 120)
-                Rectangle()
-                    .frame(width: 200, height: 120)
-            }
-            HStack(spacing: 1) {
-                Rectangle()
-                    .frame(width: 200, height: 120)
-                Rectangle()
-                    .frame(width: 200, height: 120)
+               VideoStreamingView()
+                    .environment(userManager)
             }
             Spacer()
             ZStack {
@@ -105,6 +98,7 @@ struct SecurityCameraView: View {
 #Preview {
     SecurityCameraView()
         .environmentObject(ControlViewViewModel())
+        .environment(UserManager())
 }
 
 

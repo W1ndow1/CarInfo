@@ -9,12 +9,14 @@ import SwiftUI
 
 struct HomeTabView: View {
     @Environment(AuthViewModel.self)private var authVM
+    @Environment(UserManager.self)private var userManager
     
     var body: some View {
         HStack {
-            if let currentUser = authVM.currentUser {
+            if let currentUserID = authVM.currentUserID {
                 TabView {
-                    ControlView()
+                    
+                    ControlView(currentUserID: currentUserID)
                         .tag(0)
                         .tabItem({
                             Label("제어", systemImage: "car.side")
@@ -31,6 +33,7 @@ struct HomeTabView: View {
                             Label("설정", systemImage: "gear")
                         })
                 }
+                .environment(userManager)
             } else {
                 LoginView()
                     .environment(authVM)
@@ -43,4 +46,5 @@ struct HomeTabView: View {
 #Preview {
     HomeTabView()
         .environment(AuthViewModel())
+        .environment(UserManager())
 }

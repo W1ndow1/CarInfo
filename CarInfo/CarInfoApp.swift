@@ -12,6 +12,7 @@ import Supabase
 @main
 struct CarInfoApp: App {
     @State private var authVM = AuthViewModel()
+    @State private var userManager = UserManager()
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -30,6 +31,7 @@ struct CarInfoApp: App {
         WindowGroup {
             HomeTabView()
                 .environment(authVM)
+                .environment(userManager)
         }
         .modelContainer(sharedModelContainer)
     }

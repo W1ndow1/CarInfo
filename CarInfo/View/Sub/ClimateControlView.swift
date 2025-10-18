@@ -89,8 +89,8 @@ struct ClimateControlView: View {
         ScrollView {
             LazyVStack(spacing: 20) {
                 HStack {
-                    Text("실내 \(String(format: "%.0f", vm.carStatus.carTemp))℃")
-                    Text("실외 \(String(format: "%.0f", vm.carStatus.outsideTemp))℃")
+                    Text("실내 \(String(format: "%.0f", vm.currentCarStatus.carTemp))℃")
+                    Text("실외 \(String(format: "%.0f", vm.currentCarStatus.outsideTemp))℃")
                 }
                 .padding(.top, 30)
                 //공조 조절 패널
@@ -100,7 +100,7 @@ struct ClimateControlView: View {
                             vm.isFanOn.toggle()
                         } label: {
                             Image(systemName: "power.circle")
-                                .font(.system(size: 30, weight: .light))
+                                .font(.system(size: 30, weight: vm.isFanOn ? .bold : .light))
                                 .foregroundStyle(.foreground)
                         }
                         .padding(.horizontal, 40)
@@ -109,7 +109,7 @@ struct ClimateControlView: View {
                     }
                     
                     Button {
-                        vm.carStatus.setTemp -= 0.5
+                        vm.setTemp -= 0.5
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 30, weight: .light))
@@ -117,13 +117,13 @@ struct ClimateControlView: View {
                     }
                     
                     
-                    Text("\(String(format: "%.1f", vm.carStatus.setTemp))℃")
+                    Text("\(String(format: "%.1f", vm.setTemp))℃")
                         .font(.system(size: 30, weight: vm.isFanOn ? .bold : .light))
                         .frame(width: 110)
                         .padding(.horizontal, 15)
                     
                     Button {
-                        vm.carStatus.setTemp += 0.5
+                        vm.setTemp += 0.5
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 30, weight: .light))
