@@ -15,9 +15,18 @@ struct SecurityCameraView: View {
     var body: some View {
         VStack(spacing: 1) {
             HStack(spacing: 1) {
-               VideoStreamingView()
-                    .environment(userManager)
+                VideoStreamingView(position: .front)
+                VideoStreamingView(position: .back)
+                    
             }
+            HStack(spacing: 1) {
+                VideoStreamingView(position: .left)
+                VideoStreamingView(position: .right)
+            }
+            .environment(userManager)
+            
+            
+            
             Spacer()
             ZStack {
                 RoundedRectangle(cornerRadius: 30)
@@ -94,14 +103,11 @@ struct SecurityCameraView: View {
     }
 }
 
-
 #Preview {
     SecurityCameraView()
         .environmentObject(ControlViewViewModel())
         .environment(UserManager())
 }
-
-
 
 struct CameraVisioinRange: Shape {
     var startAngle: Angle
@@ -131,10 +137,11 @@ struct CameraButtonControl: View {
         
         let currentStatus = vm.getCameraStatus(for: position)
         let fov = position.fovData
-        
         VStack {
             Button {
                 vm.setCameraStatus(for: position)
+                print("\(position.rawValue), \(currentStatus)")
+                
             } label: {
                 Circle()
                     .stroke(style: .init(lineWidth: 1))
