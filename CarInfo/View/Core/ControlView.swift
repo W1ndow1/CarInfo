@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ControlView: View {
+    @Environment(UserManager.self)private var userVM
     @StateObject private var viewModel = ControlViewViewModel()
     @State private var isDoorLock = false
     @State private var isFanOn = false
@@ -15,7 +16,6 @@ struct ControlView: View {
     @State private var chargeValue: CGFloat = 80
     @State private var isWindowOpen = false
     @State private var isFanOptionOn = false
-    @Environment(UserManager.self) var userManager
     
     var currentUserID: String = ""
     
@@ -58,6 +58,9 @@ struct ControlView: View {
                     scrollViewSection()
                 }
                 .zIndex(0)
+            }
+            .onAppear() {
+                viewModel.carStatus = userVM.currentCarStatus?.first
             }
         }
     }
@@ -104,7 +107,6 @@ struct ControlView: View {
                 NavigationLink(destination:
                                 SecurityCameraView()
                     .environmentObject(viewModel)
-                    .environment(userManager)
                 ) {
                     HStack {
                         Image(systemName: "video")

@@ -18,7 +18,7 @@ class VideoPlayerViewModel: ObservableObject {
     
     func loadVideoURL(for position: CameraPosition) {
         self.isLoading = true
-        self.videoURL = nil // 이전 URL 초기화
+        self.videoURL = nil
         
         let videoFileName: String
         switch position {
@@ -26,7 +26,7 @@ class VideoPlayerViewModel: ObservableObject {
         case .back: videoFileName = "back.mp4"
         case .left: videoFileName = "left.mp4"
         case .right: videoFileName = "right.mp4"
-        case .inner: videoFileName = "inner.mp4" // 내부 카메라 영상 파일명 가정
+        case .inner: videoFileName = "inner.mp4"
         }
         
         Task {

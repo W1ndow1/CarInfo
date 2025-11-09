@@ -27,7 +27,30 @@ struct UserService {
             .value
     }
     
-    func uploadCurrentUserCarRegistration() async throws {
-        //let data = try await
+    func fetchCarStatusesForCurrentUser() async throws -> [CarStatus] {
+        let user = try await client.auth.session.user
+        let carStatuses: [CarStatus] = try await client.from("cars")
+            .select("*")
+            .eq("user_id", value: user.id.uuidString)
+            .execute()
+            .value
+
+        return carStatuses
+    }
+    
+    func registerCar(carId: String) async throws -> CarStatus {
+        // 파라미터로 userId를 받지 않고, 인증 세션에서 직접 가져옵니다.
+        let currentUserId = try await client.auth.session.user.id
+
+        let newCar = CarStatus(id: carId, user_id: currentUserId.uuidString)
+        let createdCar: CarStatus = try await client.from("cars")
+            .insert(newCar)
+            .select()
+            .single()
+            .execute()
+            .value
+        return createdCar
+
     }
 }
+

@@ -13,7 +13,7 @@ struct VideoStreamingView: View {
     let position: CameraPosition
     @StateObject private var videoVM: VideoPlayerViewModel
     @Environment(UserManager.self) var userManager
-    @EnvironmentObject var vm: ControlViewViewModel // ControlViewViewModel 접근
+    @EnvironmentObject var securityVM: SecurityCameraViewModel
 
     init(position: CameraPosition) {
         self.position = position
@@ -21,8 +21,7 @@ struct VideoStreamingView: View {
     }
     
     var body: some View {
-        // ControlViewViewModel의 상태에 따라 영상 표시 여부 결정
-        if vm.getCameraStatus(for: position) {
+        if securityVM.getCameraStatus(for: position) {
             VStack {
                 if videoVM.isLoading {
                     ProgressView()
@@ -30,7 +29,7 @@ struct VideoStreamingView: View {
                 } else if let url = videoVM.videoURL {
                     VideoPlayer(player: AVPlayer(url: url))
                         .frame(width: 200, height: 125)
-                        // .onAppear { AVPlayer(url: url).play() } // VideoPlayer가 자동으로 재생 관리
+                        .onAppear { AVPlayer(url: url).play() }
                 } else {
                     Rectangle()
                         .foregroundStyle(.gray)
@@ -65,4 +64,5 @@ struct VideoStreamingView: View {
     VideoStreamingView(position: .front)
         .environment(UserManager())
         .environmentObject(ControlViewViewModel())
+        .environmentObject(SecurityCameraViewModel())
 }

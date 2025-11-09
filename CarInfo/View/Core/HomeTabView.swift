@@ -9,37 +9,41 @@ import SwiftUI
 
 struct HomeTabView: View {
     @Environment(AuthViewModel.self)private var authVM
-    @Environment(UserManager.self)private var userManager
-    
+    @Environment(UserManager.self)private var userVM
+
     var body: some View {
         HStack {
             if let currentUserID = authVM.currentUserID {
-                TabView {
-                    
-                    ControlView(currentUserID: currentUserID)
-                        .tag(0)
-                        .tabItem({
-                            Label("제어", systemImage: "car.side")
-                        })
-                    LocationTrackerView()
-                        .tag(1)
-                        .tabItem({
-                            Label("탐색", systemImage: "map")
-                        })
-                    SettingView()
-                        .environment(authVM)
-                        .tag(2)
-                        .tabItem({
-                            Label("설정", systemImage: "gear")
-                        })
+                if userVM.isRegistered {
+                    TabView {
+                        ControlView(currentUserID: currentUserID)
+                            .tag(0)
+                            .tabItem({
+                                Label("제어", systemImage: "car.side")
+                            })
+                        LocationTrackerView()
+                            .tag(1)
+                            .tabItem({
+                                Label("탐색", systemImage: "map")
+                            })
+                        SettingView()
+                            .environment(authVM)
+                            .tag(2)
+                            .tabItem({
+                                Label("설정", systemImage: "gear")
+                            })
+                    }
+                } else {
+                    CarRegistrationView()
                 }
-                .environment(userManager)
             } else {
                 LoginView()
-                    .environment(authVM)
             }
         }
-        .task { await authVM.refreshUser() }
+        .task {
+            await authVM.refreshUser()
+            await userVM.loadUserCarStatuses()
+        }
     }
 }
 

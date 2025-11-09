@@ -8,20 +8,25 @@
 import SwiftUI
 
 struct SecurityCameraView: View {
-    @EnvironmentObject var vm: ControlViewViewModel
+
     @Environment(\.dismiss) var dismiss
     @Environment(UserManager.self) var userManager
+    @StateObject var securityVM = SecurityCameraViewModel()
     
     var body: some View {
         VStack(spacing: 1) {
             HStack(spacing: 1) {
                 VideoStreamingView(position: .front)
+                    .environmentObject(securityVM)
                 VideoStreamingView(position: .back)
-                    
+                    .environmentObject(securityVM)
+        
             }
             HStack(spacing: 1) {
                 VideoStreamingView(position: .left)
+                    .environmentObject(securityVM)
                 VideoStreamingView(position: .right)
+                    .environmentObject(securityVM)
             }
             .environment(userManager)
             
@@ -36,18 +41,23 @@ struct SecurityCameraView: View {
                 CameraButtonControl(position: CameraPosition.inner)
                     .offset(y: -90)
                     .zIndex(2)
+                    .environmentObject(securityVM)
                 CameraButtonControl(position: CameraPosition.front)
                     .offset(y: -150)
                     .zIndex(0)
+                    .environmentObject(securityVM)
                 CameraButtonControl(position: CameraPosition.left)
                     .offset(x: -150, y: 0)
                     .zIndex(0)
+                    .environmentObject(securityVM)
                 CameraButtonControl(position: CameraPosition.right)
                     .offset(x: 150, y: 0)
                     .zIndex(0)
+                    .environmentObject(securityVM)
                 CameraButtonControl(position: CameraPosition.back)
                     .offset(y: 150)
                     .zIndex(0)
+                    .environmentObject(securityVM)
             }
             .frame(width: 400, height: 400)
             
@@ -131,15 +141,15 @@ struct CameraVisioinRange: Shape {
 
 struct CameraButtonControl: View {
     let position: CameraPosition
-    @EnvironmentObject var vm: ControlViewViewModel
+    @EnvironmentObject var securityVM: SecurityCameraViewModel
     
     var body: some View {
         
-        let currentStatus = vm.getCameraStatus(for: position)
+        let currentStatus = securityVM.getCameraStatus(for: position)
         let fov = position.fovData
         VStack {
             Button {
-                vm.setCameraStatus(for: position)
+                securityVM.setCameraStatus(for: position) // 변경
                 print("\(position.rawValue), \(currentStatus)")
                 
             } label: {

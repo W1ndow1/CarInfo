@@ -17,22 +17,19 @@ class AuthViewModel: ObservableObject {
     var session: Session? = nil
     var isLoading = false
     var errorMessage: String?
-    
     var currentUserID: String?
+    var authState: AuthState = .checking
     
     private var authService = SupabaseAuthService()
-    
     
     init(authService: SupabaseAuthService = SupabaseAuthService()) {
         self.authService = authService
     }
-    
-    
-    
+        
     func signUp(email: String, password: String, username: String) async {
         do {
             self.currentUserID = try await authService.signUp(email: email, password: password, username: username)
-            
+            self.authState = .authenticated
         } catch {
             print("DEBUG: Sign up Error:\(error.localizedDescription)")
         }
@@ -41,6 +38,7 @@ class AuthViewModel: ObservableObject {
     func signIn(email: String, password: String) async {
         do {
             self.currentUserID = try await authService.signIn(email: email, password: password)
+            self.authState = .authenticated
         } catch {
             print("DEBUG: Sign in Error:\(error.localizedDescription)")
         }
@@ -49,7 +47,8 @@ class AuthViewModel: ObservableObject {
     func signOut() async {
         do {
             try await authService.signOut()
-            currentUserID = nil
+            self.currentUserID = nil
+            self.authState = .unauthenticated
         } catch {
             print("DEBUG: Sign Out Error:\(error.localizedDescription)")
         }

@@ -9,6 +9,8 @@ import Foundation
 import Supabase
 
 struct SupabaseAuthService {
+
+    //서버정보 초기화
     private let client: SupabaseClient
     
     init() {

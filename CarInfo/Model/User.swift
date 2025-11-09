@@ -21,5 +21,9 @@ struct User: Codable, Identifiable {
     }
 }
 
-//c3f374ec-f7ae-4785-962a-524c47c03766
-//c3f374ec-f7ae-4785-962a-524c47c03766
+
+enum AuthState {
+    case checking
+    case authenticated
+    case unauthenticated
+}

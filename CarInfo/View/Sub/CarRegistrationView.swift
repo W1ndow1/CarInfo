@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct CarRegistrationView: View {
+    @Environment(UserManager.self) var userVM
+    @Environment(AuthViewModel.self) var authVM
     @State private var vehicleId = ""
+    @State private var isCheckId: Bool = false
+    
     var body: some View {
         VStack {
             Text("소유차량등록하기")
@@ -21,9 +25,20 @@ struct CarRegistrationView: View {
             .padding(15)
             .background(Color.gray.secondary)
             .clipShape(RoundedRectangle(cornerRadius: 15))
+            .onChange(of: vehicleId) { newValue, oldValue in
+                
+            }
             
             Button {
-                
+                //KMHEL13CPYA000001
+                if userVM.checkCarCodeLength(carId: vehicleId) {
+                    isCheckId = true
+                    Task {
+                        await userVM.registrationCar(carId: vehicleId)
+                    }
+                } else {
+                    isCheckId = false
+                }
             } label: {
                 Text("등록")
                     .padding(15)
@@ -33,6 +48,8 @@ struct CarRegistrationView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 15))
             }
             
+            Text(isCheckId ? "등록성공" : "차대번호 17자리를 확인해주세요")  
+            
         }
         .padding()
     }
@@ -40,4 +57,6 @@ struct CarRegistrationView: View {
 
 #Preview {
     CarRegistrationView()
+        .environment(UserManager())
+        .environment(AuthViewModel())
 }
