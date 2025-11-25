@@ -9,31 +9,29 @@ import SwiftUI
 
 struct ControlView: View {
     @Environment(UserManager.self)private var userVM
-    @StateObject private var viewModel = ControlViewViewModel()
-    @State private var isDoorLock = false
+    @StateObject private var vm = ControlViewViewModel()
+    @State private var isDoorLock = true
     @State private var isFanOn = false
     @State private var isChargeOn = false
     @State private var chargeValue: CGFloat = 80
     @State private var isWindowOpen = false
     @State private var isFanOptionOn = false
     
-    var currentUserID: String = ""
-    
     var body: some View {
         NavigationStack {
             ZStack {
                 ClimateControlView(isPresented: $isFanOptionOn)
-                    .environmentObject(viewModel)
+                    .environmentObject(vm)
                     .zIndex(1)
                 VStack(spacing: 20) {
                     //Header
                     HStack {
                         VStack(alignment: .leading, spacing: -5){
-                            Text("씽씽이")
+                            Text(vm.carStatus?.carName ?? "마이카")
                                 .font(.system(size: 20, weight: .bold))
-                            DynamicBatteryView(batteryLevel: viewModel.currentCarStatus.batteryLevel)
+                            DynamicBatteryView(batteryLevel: vm.currentCarStatus.batteryLevel)
                                 .frame(width: 40, height: 35)
-                            Text("주차중")
+                            Text(vm.carStatus?.status.rawValue ?? "")
                                 .font(.system(size: 15, weight: .light))
                         }
                         Spacer()
@@ -44,7 +42,7 @@ struct ControlView: View {
                                 Text("흐림")
                                     .font(.system(size: 20, weight: .light))
                             }
-                            Text(String(format:"%.0f", viewModel.currentCarStatus.setTemp) + "℃")
+                            Text(String(format:"%.0f", vm.carStatus?.outsideTemp ?? "") + "℃")
                         }
                     }
                     .padding(.horizontal, 5)
@@ -60,7 +58,7 @@ struct ControlView: View {
                 .zIndex(0)
             }
             .onAppear() {
-                viewModel.carStatus = userVM.currentCarStatus?.first
+                //vm.carStatus = userVM.currentCarStatus?.first
             }
         }
     }
@@ -68,7 +66,7 @@ struct ControlView: View {
     @ViewBuilder
     func scrollViewSection() -> some View {
         ScrollView {
-            bodyButton()
+            bodyButtonGroup()
                 .padding(.vertical, 10)
             if isChargeOn {
                 chargeSection()
@@ -90,10 +88,10 @@ struct ControlView: View {
                         VStack(alignment:.leading) {
                             Text("실내온도")
                             HStack {
-                                if viewModel.isFanOn {
+                                if vm.carStatus?.isFanOn ?? false {
                                     Text("활성")
                                 }
-                                Text(String(format:"%.0f", viewModel.currentCarStatus.setTemp) + "℃")
+                                Text(String(format:"%.1f", vm.carStatus?.setTemp ?? "22") + "℃")
                             }
                         }
                         Spacer()
@@ -106,7 +104,7 @@ struct ControlView: View {
                 //카메라
                 NavigationLink(destination:
                                 SecurityCameraView()
-                    .environmentObject(viewModel)
+                    .environmentObject(vm)
                 ) {
                     HStack {
                         Image(systemName: "video")
@@ -197,26 +195,30 @@ struct ControlView: View {
     }
     
     @ViewBuilder
-    func bodyButton() -> some View {
+    func bodyButtonGroup() -> some View {
         HStack(spacing: 35) {
+            //도어락
             Button {
                 isDoorLock.toggle()
+                vm.toggleDoorControl(isLock: isDoorLock)
             } label: {
-                Image(systemName: isDoorLock ? "lock.open" : "lock")
+                Image(systemName: isDoorLock ? "lock" : "lock.open")
                     .font(.system(size: 30, weight: .light))
                     .foregroundStyle(.foreground)
                     .scaleEffect(x: -1, y: 1)
                     .frame(width: 30, height: 30)
             }
+            //공조
             Button {
-                    viewModel.isFanOn.toggle()
+                vm.isFanOn.toggle()
+                vm.toggleFanControl(isOn: isFanOn)
             } label: {
-                Image(systemName: viewModel.isFanOn ? "fan" : "fan.slash")
+                Image(systemName: vm.isFanOn ? "fan" : "fan.slash")
                     .font(.system(size: 30, weight: .light))
                     .foregroundStyle(.foreground)
                     .frame(width: 30, height: 30)
             }
-            
+            //충전
             Button {
                 withAnimation {
                     isChargeOn.toggle()
@@ -227,6 +229,7 @@ struct ControlView: View {
                     .foregroundStyle(.foreground)
                     .frame(width: 30, height: 30)
             }
+            //창문
             Button {
                 withAnimation {
                     isWindowOpen.toggle()
@@ -237,6 +240,7 @@ struct ControlView: View {
                     .foregroundStyle(.foreground)
                     .frame(width: 30, height: 30)
             }
+            //테일게이트
             Button {
                 
             } label: {

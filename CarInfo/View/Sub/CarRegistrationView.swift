@@ -35,6 +35,7 @@ struct CarRegistrationView: View {
                     isCheckId = true
                     Task {
                         await userVM.registrationCar(carId: vehicleId)
+                        await authVM.checkCarRegistration()
                     }
                 } else {
                     isCheckId = false

@@ -29,10 +29,30 @@ struct CarInfoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeTabView()
-                .environment(authVM)
-                .environment(userManager)
+            groupView
         }
+        .environment(authVM)
+        .environment(userManager)
         .modelContainer(sharedModelContainer)
+    }
+    
+    @ViewBuilder
+    private var groupView: some View {
+        switch authVM.authState {
+        case .checkingAuth:
+            LoadingView()
+                .task {
+                    await authVM.refreshUser()
+                }
+        
+        case .checkedCarRegistration:
+            HomeTabView()
+            
+        case .unauthenticated:
+            LoginView()
+            
+        case .carNotRegistered:
+            CarRegistrationView()
+        }
     }
 }

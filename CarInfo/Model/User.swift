@@ -23,7 +23,8 @@ struct User: Codable, Identifiable {
 
 
 enum AuthState {
-    case checking
-    case authenticated
+    case checkingAuth
     case unauthenticated
+    case checkedCarRegistration
+    case carNotRegistered
 }

@@ -98,13 +98,14 @@ struct ClimateControlView: View {
                     VStack(spacing: 10) {
                         Button{
                             vm.isFanOn.toggle()
+                            vm.toggleFanControl(isOn: vm.isFanOn)
                         } label: {
                             Image(systemName: "power.circle")
                                 .font(.system(size: 30, weight: vm.isFanOn ? .bold : .light))
                                 .foregroundStyle(.foreground)
                         }
                         .padding(.horizontal, 40)
-                        Text(vm.isFanOn ? "켜짐" : "끔")
+                        Text(vm.carStatus?.isFanOn ?? false ? "켜짐" : "끔")
                             .font(.system(size: 13, weight: vm.isFanOn ? .bold : .light))
                     }
                     
@@ -115,7 +116,6 @@ struct ClimateControlView: View {
                             .font(.system(size: 30, weight: .light))
                             .foregroundStyle(.foreground)
                     }
-                    
                     
                     Text("\(String(format: "%.1f", vm.setTemp))℃")
                         .font(.system(size: 30, weight: vm.isFanOn ? .bold : .light))
@@ -129,6 +129,7 @@ struct ClimateControlView: View {
                             .font(.system(size: 30, weight: .light))
                             .foregroundStyle(.foreground)
                     }
+                    
                     VStack(spacing: 10) {
                         
                         Button{
@@ -148,8 +149,9 @@ struct ClimateControlView: View {
                     
                 }
                 Group {
-                    //(1)성애 제거
+                    //성애 제거
                     Button {
+                        
                     } label: {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(lineWidth: 1)
@@ -163,7 +165,7 @@ struct ClimateControlView: View {
                                 .padding(.horizontal, 10)
                             }
                     }
-                    //2)스마트 모드
+                    //스마트 모드
                     Button {
                     } label: {
                         RoundedRectangle(cornerRadius: 10)
@@ -179,7 +181,7 @@ struct ClimateControlView: View {
                                 .padding(.horizontal, 10)
                             }
                     }
-                    //3)차박 모드
+                    //차박 모드
                     Button {
                     } label: {
                         RoundedRectangle(cornerRadius: 10)

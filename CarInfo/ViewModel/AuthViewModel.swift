@@ -7,8 +7,6 @@
 
 import Foundation
 import Supabase
-import Combine
-
 
 @Observable
 @MainActor
@@ -18,18 +16,24 @@ class AuthViewModel: ObservableObject {
     var isLoading = false
     var errorMessage: String?
     var currentUserID: String?
-    var authState: AuthState = .checking
+    var currentVehicleID: String?
+    var authState: AuthState = .checkingAuth
+
+    private var authService: SupabaseAuthService
+    private var userService: UserService
     
-    private var authService = SupabaseAuthService()
-    
-    init(authService: SupabaseAuthService = SupabaseAuthService()) {
+    init(authService: SupabaseAuthService = SupabaseAuthService(), userService: UserService = UserService()) {
         self.authService = authService
+        self.userService = userService
+        Task {
+            await refreshUser()
+        }
     }
         
     func signUp(email: String, password: String, username: String) async {
         do {
             self.currentUserID = try await authService.signUp(email: email, password: password, username: username)
-            self.authState = .authenticated
+            await checkCarRegistration()
         } catch {
             print("DEBUG: Sign up Error:\(error.localizedDescription)")
         }
@@ -38,7 +42,7 @@ class AuthViewModel: ObservableObject {
     func signIn(email: String, password: String) async {
         do {
             self.currentUserID = try await authService.signIn(email: email, password: password)
-            self.authState = .authenticated
+            await checkCarRegistration()
         } catch {
             print("DEBUG: Sign in Error:\(error.localizedDescription)")
         }
@@ -57,9 +61,24 @@ class AuthViewModel: ObservableObject {
     func refreshUser() async {
         do {
             currentUserID = try await authService.getCurrentUser()
+            await checkCarRegistration()
         } catch {
             print("DEBUG: Refresh User Error:\(error.localizedDescription)")
             currentUserID = nil
+            self.authState = .unauthenticated
+        }
+    }
+    
+    func checkCarRegistration() async {
+        do {
+            let carStatuses = try await userService.fetchCarStatusesForCurrentUser()
+            currentVehicleID = carStatuses.first?.id ?? ""
+            self.authState = carStatuses.count > 0
+            ? .checkedCarRegistration
+            : .carNotRegistered
+        } catch {
+            self.authState = .carNotRegistered
+            print("DEBUG: Check Car Registration Error:\(error.localizedDescription)")
         }
     }
 }

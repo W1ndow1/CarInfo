@@ -13,10 +13,8 @@ struct SupabaseAuthService {
     //서버정보 초기화
     private let client: SupabaseClient
     
-    init() {
-        self.client = SupabaseClient.init(
-            supabaseURL: Config.Supabase.supabaseURL,
-            supabaseKey: Config.Supabase.supabaseAPI)
+    init(client: SupabaseClient = .shared) {
+        self.client = client
     }
     
     func signUp(email: String, password: String, username: String) async throws -> String {
