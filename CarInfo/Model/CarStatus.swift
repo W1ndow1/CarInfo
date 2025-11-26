@@ -35,6 +35,7 @@ struct CarStatus: Codable, Identifiable {
     var isFanOn: Bool = false
     var carTemp: Double = 22.0
     var outsideTemp: Double = 26.0
+    var isWindowOpen: Bool = false
     var setTemp: Double = 22.0 {
         didSet {
             if setTemp > maxTemperature {
@@ -59,6 +60,8 @@ struct CarStatus: Codable, Identifiable {
         case outsideTemp = "outside_temp"
         case setTemp = "set_temp"
         case doorLock = "door_lock"
+        case isWindowOpen = "is_window_open"
+        
     }
     
 }

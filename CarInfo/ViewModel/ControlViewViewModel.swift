@@ -13,6 +13,7 @@ import Combine
 class ControlViewViewModel: ObservableObject {
     @Published var carStatus: CarStatus?
     @Published var isFanOn: Bool = false
+    @Published var isWindowOpen:Bool = false
     @Published var isSteeringWheelHeatOn: Bool = false
     @Published var seatHeaterStatuses: [SeatPosition: SeatHeaterStatus] = [
         .driver: SeatHeaterStatus(level: 0),
@@ -29,6 +30,7 @@ class ControlViewViewModel: ObservableObject {
             }
         }
     }
+    @Published var isDoorLock: Bool = false
     
     var currentCarStatus: CarStatus {
         carStatus ?? CarStatus.mock()
@@ -42,30 +44,32 @@ class ControlViewViewModel: ObservableObject {
     private let userManager: UserManager
     
     init(carControlService: CarControlService = CarControlService(),
-         userManager: UserManager = UserManager()
-    ) {
+         userManager: UserManager = UserManager()) {
         self.carControlService = carControlService
         self.userManager = userManager
         
         Task {
             await fetchInitialCarstatus()
         }
-       
-        setupSubscriptions()
     }
     
     private func fetchInitialCarstatus() async{
         if let initialStatus = userManager.currentCarStatus {
+            //초기값 가져오기
             self.carStatus = initialStatus.first
             self.setTemp = initialStatus.first?.setTemp ?? 22.0
             self.isFanOn = initialStatus.first?.isFanOn ?? false
+            self.isWindowOpen = initialStatus.first?.isWindowOpen ?? false
+            self.isDoorLock = initialStatus.first?.doorLock ?? false
+            //속성구독처리
+            setupSubscriptions()
         }
     }
 
     private func setupSubscriptions() {
         //온도조절 Sub
         $setTemp
-            .dropFirst()
+            .dropFirst(1)
             .debounce(for: .seconds(0.8), scheduler: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] debouncedTemp in
@@ -75,6 +79,22 @@ class ControlViewViewModel: ObservableObject {
                 self.setTemperature(clampedTemp)
             }
             .store(in: &cancellables)
+        
+        $isWindowOpen
+            .dropFirst(1)
+            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] openWindow in
+                print(("창문 열기: \(openWindow)"))
+                self?.toggleWindowControl(isLock: openWindow )
+            }
+            .store(in: &cancellables)
+    }
+    
+    func toggleWindowControl(isLock: Bool) {
+        Task {
+            await updateCarControlStatus(column: "is_window_open", value: isLock)
+        }
     }
 
     func toggleFanControl(isOn: Bool) {

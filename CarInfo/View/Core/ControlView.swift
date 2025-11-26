@@ -102,10 +102,7 @@ struct ControlView: View {
                 .padding(15)
                
                 //카메라
-                NavigationLink(destination:
-                                SecurityCameraView()
-                    .environmentObject(vm)
-                ) {
+                NavigationLink(destination: SecurityCameraView().environmentObject(vm)) {
                     HStack {
                         Image(systemName: "video")
                             .font(.system(size: 30, weight: .light))
@@ -143,7 +140,7 @@ struct ControlView: View {
             Group {
                 HStack(spacing: 30) {
                     Button {
-                        
+                        vm.isWindowOpen = false
                     } label: {
                         VStack(spacing: 5) {
                             Image(systemName: "arrow.up.to.line")
@@ -154,7 +151,7 @@ struct ControlView: View {
                     }
                     
                     Button {
-                        
+                        vm.isWindowOpen = true
                     } label: {
                         VStack(spacing: 5) {
                             Image(systemName: "arrow.down.to.line")
@@ -211,7 +208,7 @@ struct ControlView: View {
             //공조
             Button {
                 vm.isFanOn.toggle()
-                vm.toggleFanControl(isOn: isFanOn)
+                vm.toggleFanControl(isOn: vm.isFanOn)
             } label: {
                 Image(systemName: vm.isFanOn ? "fan" : "fan.slash")
                     .font(.system(size: 30, weight: .light))
